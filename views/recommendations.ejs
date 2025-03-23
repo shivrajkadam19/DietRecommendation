@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f5ff;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #4A90E2;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s ease;
+        }
+
+        .section:hover {
+            transform: scale(1.02);
+        }
+
+        .section h3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4A90E2, #357ABD);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .section h3 i {
+            margin-right: 8px;
+        }
+
+        ul {
+            padding: 15px;
+            list-style: none;
+        }
+
+        ul li {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f1f5ff;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: 0.2s ease;
+            border-left: 4px solid #4A90E2;
+        }
+
+        ul li:hover {
+            background: #e3ebff;
+        }
+
+        ul li i {
+            margin-right: 10px;
+            color: #4A90E2;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            text-decoration: none;
+            background: linear-gradient(135deg, #4A90E2, #357ABD);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #357ABD, #4A90E2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Personalized Recommendations</h2>
+
+        <% const sections={ diet_types: "Diet Recommendations" , workouts: "Workout Options" ,
+            breakfasts: "Breakfast Ideas" , lunches: "Lunch Options" , dinners: "Dinner Options" ,
+            additional_tips: "Additional Tips" }; const icons={ diet_types: "fas fa-utensils" ,
+            workouts: "fas fa-dumbbell" , breakfasts: "fas fa-egg" , lunches: "fas fa-drumstick-bite" ,
+            dinners: "fas fa-pizza-slice" , additional_tips: "fas fa-lightbulb" }; %>
+
+            <% if (recommendations && Object.keys(recommendations).length> 0) { %>
+                <% Object.keys(sections).forEach(section=> { %>
+                    <% if (recommendations[section] && recommendations[section].length> 0) { %>
+                        <div class="section">
+                            <h3>
+                                <i class="<%= icons[section] %>"></i>
+                                <%= sections[section] %>
+                            </h3>
+                            <ul>
+                                <% recommendations[section].forEach(item=> { %>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <%= item %>
+                                    </li>
+                                    <% }) %>
+                            </ul>
+                        </div>
+                        <% } %>
+                            <% }) %>
+                                <% } else { %>
+                                    <p style="text-align: center; font-size: 16px; color: #777;">No recommendations
+                                        available.</p>
+                                    <% } %>
+
+                                        <a href="/" class="back-btn">Go Back</a>
+    </div>
+</body>
+
+</html>
+
+<!-- ***********************  ******8 *******8 -->
