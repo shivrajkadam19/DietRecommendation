@@ -4,94 +4,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personalized Diet and Workout Recommendations</title>
+    <title>FitLife - Personalized Diet & Workout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f9fc;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f5ff;
             color: #333;
-            margin: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4A90E2, #357ABD);
+            color: white;
             padding: 20px;
+            text-align: center;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
-            padding: 10px 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content {
+            margin-top: 20px;
             background-color: white;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
         }
 
-        h2 {
-            color: #4A90E2;
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        label {
-            display: block;
-            margin: 15px 0 5px;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            /* margin: 5px 0 15px; */
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        textarea {
-            resize: vertical;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4A90E2;
+        .tab {
+            background: #4A90E2;
             color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
+            transition: 0.3s;
         }
 
-        button:hover {
-            background-color: #357ABD;
+        .tab:hover {
+            background: #357ABD;
+        }
+
+        .section {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fbff;
+            border-radius: 10px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .start-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #4A90E2, #357ABD);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .start-btn:hover {
+            background: linear-gradient(135deg, #357ABD, #4A90E2);
         }
     </style>
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+    </script>
 </head>
 
 <body>
+    <div class="header">
+        <h1>Welcome to FitLife</h1>
+        <p>Your Personalized Diet & Workout Companion</p>
+    </div>
     <div class="container">
-        <h2>Personalized Diet & Workout Planner</h2>
-        <form action="/recommendations" method="POST">
-            <label>Dietary Preferences:</label>
-            <input type="text" name="dietary_preferences" placeholder="e.g., vegetarian, high-protein" required>
-
-            <label>Fitness Goals:</label>
-            <input type="text" name="fitness_goals" placeholder="e.g., weight loss, muscle gain" required>
-
-            <label>Lifestyle Factors:</label>
-            <input type="text" name="lifestyle_factors" placeholder="e.g., active, sedentary" required>
-
-            <label>Dietary Restrictions:</label>
-            <input type="text" name="dietary_restrictions" placeholder="e.g., gluten-free, lactose-intolerant" required>
-
-            <label>Health Conditions:</label>
-            <input type="text" name="health_conditions" placeholder="e.g., diabetes, high blood pressure" required>
-
-            <label>Your Query:</label>
-            <textarea name="user_query" placeholder="Describe your goal briefly" required></textarea>
-
-            <button type="submit">Get Recommendations</button>
-        </form>
+        <div class="content">
+            <h2>Transform Your Health & Fitness</h2>
+            <p>Get customized diet plans and workout recommendations tailored to your lifestyle, goals, and dietary
+                needs.</p>
+            <a href="/form" class="start-btn">Get Started</a>
+        </div>
+        <div class="tabs">
+            <div class="tab" onclick="showSection('about')">About Us</div>
+            <div class="tab" onclick="showSection('features')">Features</div>
+        </div>
+        <div id="about" class="section active">
+            <h3>About FitLife</h3>
+            <p>FitLife is designed to provide personalized diet and fitness plans based on your unique health
+                conditions, lifestyle, and goals. Whether you're looking to lose weight, gain muscle, or maintain a
+                healthy lifestyle, we have the right plan for you.</p>
+        </div>
+        <div id="features" class="section">
+            <h3>Key Features</h3>
+            <ul list-style-type="none">
+                <li>Customized diet plans based on your preferences</li>
+                <li>Tailored workout recommendations for all fitness levels</li>
+                <li>Healthy meal suggestions including breakfast, lunch, and dinner</li>
+                <li>Additional wellness tips for hydration, supplements, and snacking</li>
+            </ul>
+        </div>
     </div>
 </body>
 

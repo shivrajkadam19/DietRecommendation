@@ -1,128 +1,84 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
-const path = require("path");
 
 const app = express();
 const port = 3000;
 
+// Middleware
+app.use(cors({ origin: "*" })); // Enable CORS
+app.use(bodyParser.json()); // Handle JSON
+app.use(express.urlencoded({ extended: true }));
+
 // Secure API Key
-const genAI = new GoogleGenerativeAI("GEMINI_API_KEY");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
-
 // Function to generate recommendations
-async function generateRecommendation(dietaryPreferences, fitnessGoals, lifestyleFactors, dietaryRestrictions, healthConditions, userQuery) {
+async function generateRecommendation(formData) {
     const prompt = `
-    Can you suggest a comprehensive plan that includes diet and workout options for better fitness?
-    Dietary Preferences: ${dietaryPreferences}
-    Fitness Goals: ${fitnessGoals}
-    Lifestyle Factors: ${lifestyleFactors}
-    Dietary Restrictions: ${dietaryRestrictions}
-    Health Conditions: ${healthConditions}
-    User Query: ${userQuery}
+You are a fitness and diet recommendation assistant. 
+Based on the following details, generate a personalized fitness and diet plan in JSON format.
 
-    Provide(create separate sections for below points and give 3-5 points for each sections, additional detail should not exceed above 5 points):
-    - diet recommendations
-    - workout options
-    - breakfast ideas
-    - lunch options
-    - dinner options
-    - Additional tips (snacks, supplements, hydration)
+Provide recommendations under the following categories:
+- Diet Recommendations
+- Workout Options
+- Breakfast Ideas
+- Lunch Options
+- Dinner Options
+- Additional Tips (snacks, supplements, hydration)
 
-    Use clear section headings.
-    `;
+Input Details:
+- Dietary Preferences: ${formData.dietary_preferences}
+- Fitness Goals: ${formData.fitness_goals}
+- Lifestyle Factors: ${formData.lifestyle_factors}
+- Dietary Restrictions: ${formData.dietary_restrictions}
+- Health Conditions: ${formData.health_conditions}
+- User Query: ${formData.user_query}
+
+Respond strictly in a valid JSON format with the following structure:
+{
+  "diet_types": ["recommendation 1", "recommendation 2"],
+  "workouts": ["workout 1", "workout 2"],
+  "breakfasts": ["breakfast 1", "breakfast 2"],
+  "lunches": ["lunch 1", "lunch 2"],
+  "dinners": ["dinner 1", "dinner 2"],
+  "additional_tips": ["tip 1", "tip 2"]
+}
+`;
 
     try {
         const response = await model.generateContent({
             contents: [{ role: "user", parts: [{ text: prompt }] }]
         });
 
-        const responseText = response.response?.text() || "No response from the model.";
-        // console.log("AI Response:", responseText);
-        return responseText;
+        console.log("AI Raw Response:", response);
+
+        const responseText = response?.response?.text();
+        if (!responseText) throw new Error("No response from AI.");
+
+        console.log("Response Text:", responseText);
+
+        // Clean and parse JSON from AI response
+        const cleanJsonString = responseText.replace(/```json|```/g, "").trim();
+        const recommendations = JSON.parse(cleanJsonString);
+        return recommendations;
+
     } catch (error) {
-        console.error("Error generating recommendations:", error);
-        return "Error generating recommendations.";
+        console.error("AI Error:", error);
+        return { error: "Failed to generate recommendations." };
     }
 }
 
-// Routes
-app.get("/", (req, res) => {
-    res.render("index", { recommendations: null });
-});
-
+// POST API to handle form submission
 app.post("/recommendations", async (req, res) => {
-    const { dietary_preferences, fitness_goals, lifestyle_factors, dietary_restrictions, health_conditions, user_query } = req.body;
-
-    const recommendationsText = await generateRecommendation(
-        dietary_preferences,
-        fitness_goals,
-        lifestyle_factors,
-        dietary_restrictions,
-        health_conditions,
-        user_query
-    );
-
-    // Define sections and expected output object
-    const recommendations = {
-        diet_types: [],
-        workouts: [],
-        breakfasts: [],
-        lunches: [],
-        dinners: [],
-        additional_tips: []
-    };
-
-    // console.log("Response Text:", recommendationsText);
-
-    // Define section mappings
-    const sections = {
-        "Diet Recommendations": "diet_types",
-        "Workout Options": "workouts",
-        "Breakfast Ideas": "breakfasts",
-        "Lunch Options": "lunches",
-        "Dinner Options": "dinners",
-        "Additional Tips": "additional_tips"
-    };
-
-    let currentSection = null;
-
-    // Split response by lines
-    const lines = recommendationsText.split("\n");
-
-    lines.forEach((line) => {
-        line = line.trim();
-
-        // Check if line is a section header
-        Object.keys(sections).forEach(section => {
-            if (line.toLowerCase().includes(section.toLowerCase())) {
-                currentSection = sections[section];
-            }
-        });
-
-        // If current section is set and line contains meaningful text, add it
-        if (currentSection && line && !Object.keys(sections).some(sec => line.includes(sec))) {
-            // Remove bullets, numbers, extra spaces, and markdown formatting (**bold**, *italics*)
-            const cleanedLine = line.replace(/^[-•\d.]+\s*/, "") // Remove list markers
-                .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove **bold**
-                .replace(/\*([^*]+)\*/g, "$1") // Remove *italics*
-                .trim();
-            if (cleanedLine) recommendations[currentSection].push(cleanedLine);
-        }
-    });
-
-
-    // console.log("Parsed Recommendations:", recommendations);
-    res.render("recommendations", { recommendations });
+    console.log("Request received:", req.body);
+    const recommendations = await generateRecommendation(req.body);
+    console.log("Recommendations:", recommendations);
+    res.json({ recommendations });
 });
 
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+// Start server
+app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
